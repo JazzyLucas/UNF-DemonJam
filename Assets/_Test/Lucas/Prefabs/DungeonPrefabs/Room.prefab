@@ -85,6 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d21b45c66d405548a4bdd702e439b64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  DungeonGenerationConfigurationSo: {fileID: 11400000, guid: f266c74b3f6b23642b54ffedc804f59a, type: 2}
   walls:
   - {fileID: 139100430350843384}
   - {fileID: 4214565139285450468}
@@ -266,10 +267,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Floor
       objectReference: {fileID: 0}
-    - target: {fileID: 7374305620246132504, guid: 65fafd503a92e6e49bac444e4ff480b8, type: 3}
-      propertyPath: m_NavMeshData
-      value: 
-      objectReference: {fileID: 23800000, guid: 616133f4fedc95747862aff1dab3fea9, type: 2}
     - target: {fileID: 7638606945420350690, guid: 65fafd503a92e6e49bac444e4ff480b8, type: 3}
       propertyPath: m_RootOrder
       value: 0

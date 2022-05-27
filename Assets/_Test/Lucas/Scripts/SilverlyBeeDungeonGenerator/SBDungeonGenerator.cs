@@ -8,42 +8,7 @@ using Random = UnityEngine.Random;
 
 public class SBDungeonGenerator : MonoBehaviour
 {
-    public class Cell
-    {
-        public bool visited = false;
-        public bool[] status = new bool[4];
-    }
-
-    [System.Serializable]
-    public class Rule
-    {
-        public GameObject room;
-        public Vector2Int minPosition;
-        public Vector2Int maxPosition;
-
-        public bool obligatory;
-
-        public int ProbabilityOfSpawning(int x, int y)
-        {
-            // 0 - cannot spawn 1 - can spawn 2 - HAS to spawn
-
-            if (x>= minPosition.x && x<=maxPosition.x && y >= minPosition.y && y <= maxPosition.y)
-            {
-                return obligatory ? 2 : 1;
-            }
-
-            return 0;
-        }
-
-    }
-
-    public Vector2Int size;
-    public int startPos = 0;
-    public Rule[] rooms;
-    public Vector2 offset;
-
-    private List<Cell> board;
-    private List<GameObject> objectPool;
+    [SerializeField] private DungeonGenerationConfigurationSO DungeonGenerationConfigurationSo;
 
     void Start()
     {
@@ -56,24 +21,34 @@ public class SBDungeonGenerator : MonoBehaviour
         {
             DoMazeGenerator();
         }
+
+        if (Input.GetKeyDown(KeyCode.K))
+        {
+            InitializeNavMeshes();
+        }
     }
 
-    void GenerateDungeon()
+    private void LateUpdate()
     {
+        TryInitializationOfDungeon();
+    }
 
-        for (int i = 0; i < size.x; i++)
+    private void GenerateDungeon()
+    {
+        uint tempRoomCount = 0;
+        for (int i = 0; i < DungeonGenerationConfigurationSo.size.x; i++)
         {
-            for (int j = 0; j < size.y; j++)
+            for (int j = 0; j < DungeonGenerationConfigurationSo.size.y; j++)
             {
-                Cell currentCell = board[(i + j * size.x)];
+                Cell currentCell = DungeonGenerationConfigurationSo.board[(i + j * DungeonGenerationConfigurationSo.size.x)];
                 if (currentCell.visited)
                 {
                     int randomRoom = -1;
                     List<int> availableRooms = new List<int>();
 
-                    for (int k = 0; k < rooms.Length; k++)
+                    for (int k = 0; k < DungeonGenerationConfigurationSo.rooms.Length; k++)
                     {
-                        int p = rooms[k].ProbabilityOfSpawning(i, j);
+                        int p = DungeonGenerationConfigurationSo.rooms[k].ProbabilityOfSpawning(i, j);
 
                         if(p == 2)
                         {
@@ -98,39 +73,42 @@ public class SBDungeonGenerator : MonoBehaviour
                     }
 
 
-                    var newRoom = Instantiate(rooms[randomRoom].room, new Vector3(i * offset.x, 0, -j * offset.y), Quaternion.identity, transform).GetComponent<SBRoomBehaviour>();
+                    var newRoom = Instantiate(DungeonGenerationConfigurationSo.rooms[randomRoom].room, new Vector3(i * DungeonGenerationConfigurationSo.offset.x, 0, -j * DungeonGenerationConfigurationSo.offset.y), Quaternion.identity, transform).GetComponent<SBRoomBehaviour>();
                     newRoom.UpdateRoom(currentCell.status);
                     newRoom.name += " " + i + "-" + j;
-                    objectPool.Add(newRoom.gameObject);
+                    tempRoomCount++;
+                    DungeonGenerationConfigurationSo.objectPool.Add(newRoom.gameObject);
                 }
             }
         }
 
+        DungeonGenerationConfigurationSo.roomCount = tempRoomCount;
     }
 
-    void DoMazeGenerator()
+    private void DoMazeGenerator()
     {
         // Initializations
-        if (objectPool != null)
+        DungeonGenerationConfigurationSo.roomsReady = 0;
+        if (DungeonGenerationConfigurationSo.objectPool != null)
         {
-            foreach (var obj in objectPool)
+            foreach (var obj in DungeonGenerationConfigurationSo.objectPool)
             {
                 Destroy(obj);
             }
-            objectPool.Clear();
+            DungeonGenerationConfigurationSo.objectPool.Clear();
         }
-        objectPool ??= new List<GameObject>();
-        board = new List<Cell>();
+        DungeonGenerationConfigurationSo.objectPool ??= new List<GameObject>();
+        DungeonGenerationConfigurationSo.board = new List<Cell>();
 
-        for (int i = 0; i < size.x; i++)
+        for (int i = 0; i < DungeonGenerationConfigurationSo.size.x; i++)
         {
-            for (int j = 0; j < size.y; j++)
+            for (int j = 0; j < DungeonGenerationConfigurationSo.size.y; j++)
             {
-                board.Add(new Cell());
+                DungeonGenerationConfigurationSo.board.Add(new Cell());
             }
         }
 
-        int currentCell = startPos;
+        int currentCell = DungeonGenerationConfigurationSo.startPos;
 
         Stack<int> path = new Stack<int>();
 
@@ -141,9 +119,9 @@ public class SBDungeonGenerator : MonoBehaviour
         {
             k++;
 
-            board[currentCell].visited = true;
+            DungeonGenerationConfigurationSo.board[currentCell].visited = true;
 
-            if(currentCell == board.Count - 1)
+            if(currentCell == DungeonGenerationConfigurationSo.board.Count - 1)
             {
                 break;
             }
@@ -173,15 +151,15 @@ public class SBDungeonGenerator : MonoBehaviour
                     //down or right
                     if (newCell - 1 == currentCell)
                     {
-                        board[currentCell].status[2] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[2] = true;
                         currentCell = newCell;
-                        board[currentCell].status[3] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[3] = true;
                     }
                     else
                     {
-                        board[currentCell].status[1] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[1] = true;
                         currentCell = newCell;
-                        board[currentCell].status[0] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[0] = true;
                     }
                 }
                 else
@@ -189,15 +167,15 @@ public class SBDungeonGenerator : MonoBehaviour
                     //up or left
                     if (newCell + 1 == currentCell)
                     {
-                        board[currentCell].status[3] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[3] = true;
                         currentCell = newCell;
-                        board[currentCell].status[2] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[2] = true;
                     }
                     else
                     {
-                        board[currentCell].status[0] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[0] = true;
                         currentCell = newCell;
-                        board[currentCell].status[1] = true;
+                        DungeonGenerationConfigurationSo.board[currentCell].status[1] = true;
                     }
                 }
 
@@ -205,11 +183,23 @@ public class SBDungeonGenerator : MonoBehaviour
 
         }
         GenerateDungeon();
-        InitializeNavMeshes();
     }
 
+    public void TryInitializationOfDungeon()
+    {
+        Debug.Log("Checking if all rooms are ready.");
+        Debug.Log("Rooms Ready:" + DungeonGenerationConfigurationSo.roomsReady + " / " + DungeonGenerationConfigurationSo.roomCount);
+        if (DungeonGenerationConfigurationSo.roomsReady >= DungeonGenerationConfigurationSo.roomCount)
+        {
+            Debug.Log("All rooms are ready!");
+            InitializeNavMeshes();
+            DungeonGenerationConfigurationSo.roomsReady = 0;
+        }
+    }
+    
     private void InitializeNavMeshes()
     {
+        Debug.Log("Initializing NavMeshes!");
         var surfaces =  FindObjectsOfType<NavMeshSurface>();
         foreach (var s in surfaces)
         {
@@ -222,25 +212,25 @@ public class SBDungeonGenerator : MonoBehaviour
         List<int> neighbors = new List<int>();
 
         //check up neighbor
-        if (cell - size.x >= 0 && !board[(cell-size.x)].visited)
+        if (cell - DungeonGenerationConfigurationSo.size.x >= 0 && !DungeonGenerationConfigurationSo.board[(cell-DungeonGenerationConfigurationSo.size.x)].visited)
         {
-            neighbors.Add((cell - size.x));
+            neighbors.Add((cell - DungeonGenerationConfigurationSo.size.x));
         }
 
         //check down neighbor
-        if (cell + size.x < board.Count && !board[(cell + size.x)].visited)
+        if (cell + DungeonGenerationConfigurationSo.size.x < DungeonGenerationConfigurationSo.board.Count && !DungeonGenerationConfigurationSo.board[(cell + DungeonGenerationConfigurationSo.size.x)].visited)
         {
-            neighbors.Add((cell + size.x));
+            neighbors.Add((cell + DungeonGenerationConfigurationSo.size.x));
         }
 
         //check right neighbor
-        if ((cell+1) % size.x != 0 && !board[(cell +1)].visited)
+        if ((cell+1) % DungeonGenerationConfigurationSo.size.x != 0 && !DungeonGenerationConfigurationSo.board[(cell +1)].visited)
         {
             neighbors.Add((cell +1));
         }
 
         //check left neighbor
-        if (cell % size.x != 0 && !board[(cell - 1)].visited)
+        if (cell % DungeonGenerationConfigurationSo.size.x != 0 && !DungeonGenerationConfigurationSo.board[(cell - 1)].visited)
         {
             neighbors.Add((cell -1));
         }
