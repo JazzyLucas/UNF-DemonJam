@@ -9,6 +9,8 @@ using Random = UnityEngine.Random;
 public class SBDungeonGenerator : MonoBehaviour
 {
     [SerializeField] private DungeonGenerationConfigurationSO DungeonGenerationConfigurationSo;
+    [Space(10)]
+    [SerializeField] private bool verboseDebug;
 
     void Start()
     {
@@ -21,73 +23,18 @@ public class SBDungeonGenerator : MonoBehaviour
         {
             DoMazeGenerator();
         }
-
-        if (Input.GetKeyDown(KeyCode.K))
-        {
-            InitializeNavMeshes();
-        }
     }
 
     private void LateUpdate()
     {
-        TryInitializationOfDungeon();
-    }
-
-    private void GenerateDungeon()
-    {
-        uint tempRoomCount = 0;
-        for (int i = 0; i < DungeonGenerationConfigurationSo.size.x; i++)
-        {
-            for (int j = 0; j < DungeonGenerationConfigurationSo.size.y; j++)
-            {
-                Cell currentCell = DungeonGenerationConfigurationSo.board[(i + j * DungeonGenerationConfigurationSo.size.x)];
-                if (currentCell.visited)
-                {
-                    int randomRoom = -1;
-                    List<int> availableRooms = new List<int>();
-
-                    for (int k = 0; k < DungeonGenerationConfigurationSo.rooms.Length; k++)
-                    {
-                        int p = DungeonGenerationConfigurationSo.rooms[k].ProbabilityOfSpawning(i, j);
-
-                        if(p == 2)
-                        {
-                            randomRoom = k;
-                            break;
-                        } else if (p == 1)
-                        {
-                            availableRooms.Add(k);
-                        }
-                    }
-
-                    if(randomRoom == -1)
-                    {
-                        if (availableRooms.Count > 0)
-                        {
-                            randomRoom = availableRooms[Random.Range(0, availableRooms.Count)];
-                        }
-                        else
-                        {
-                            randomRoom = 0;
-                        }
-                    }
-
-
-                    var newRoom = Instantiate(DungeonGenerationConfigurationSo.rooms[randomRoom].room, new Vector3(i * DungeonGenerationConfigurationSo.offset.x, 0, -j * DungeonGenerationConfigurationSo.offset.y), Quaternion.identity, transform).GetComponent<SBRoomBehaviour>();
-                    newRoom.UpdateRoom(currentCell.status);
-                    newRoom.name += " " + i + "-" + j;
-                    tempRoomCount++;
-                    DungeonGenerationConfigurationSo.objectPool.Add(newRoom.gameObject);
-                }
-            }
-        }
-
-        DungeonGenerationConfigurationSo.roomCount = tempRoomCount;
+        TryInitializationOfNavMeshes();
     }
 
     private void DoMazeGenerator()
     {
         // Initializations
+        DungeonGenerationConfigurationSo.forceNavMeshRecheck = false;
+        DungeonGenerationConfigurationSo.canDoGameGeneration = false;
         DungeonGenerationConfigurationSo.roomsReady = 0;
         if (DungeonGenerationConfigurationSo.objectPool != null)
         {
@@ -184,22 +131,82 @@ public class SBDungeonGenerator : MonoBehaviour
         }
         GenerateDungeon();
     }
-
-    public void TryInitializationOfDungeon()
+    
+    private void GenerateDungeon()
     {
-        Debug.Log("Checking if all rooms are ready.");
-        Debug.Log("Rooms Ready:" + DungeonGenerationConfigurationSo.roomsReady + " / " + DungeonGenerationConfigurationSo.roomCount);
+        uint tempRoomCount = 0;
+        DungeonGenerationConfigurationSo.hooksManagers = new List<HooksManager>();
+        for (int i = 0; i < DungeonGenerationConfigurationSo.size.x; i++)
+        {
+            for (int j = 0; j < DungeonGenerationConfigurationSo.size.y; j++)
+            {
+                Cell currentCell = DungeonGenerationConfigurationSo.board[(i + j * DungeonGenerationConfigurationSo.size.x)];
+                if (currentCell.visited)
+                {
+                    int randomRoom = -1;
+                    List<int> availableRooms = new List<int>();
+
+                    for (int k = 0; k < DungeonGenerationConfigurationSo.rooms.Length; k++)
+                    {
+                        int p = DungeonGenerationConfigurationSo.rooms[k].ProbabilityOfSpawning(i, j);
+
+                        if(p == 2)
+                        {
+                            randomRoom = k;
+                            break;
+                        } else if (p == 1)
+                        {
+                            availableRooms.Add(k);
+                        }
+                    }
+
+                    if(randomRoom == -1)
+                    {
+                        if (availableRooms.Count > 0)
+                        {
+                            randomRoom = availableRooms[Random.Range(0, availableRooms.Count)];
+                        }
+                        else
+                        {
+                            randomRoom = 0;
+                        }
+                    }
+
+
+                    var newRoom = Instantiate(DungeonGenerationConfigurationSo.rooms[randomRoom].room, new Vector3(i * DungeonGenerationConfigurationSo.roomsize.x, 0, -j * DungeonGenerationConfigurationSo.roomsize.y), Quaternion.identity, transform).GetComponent<SBRoomBehaviour>();
+                    newRoom.UpdateRoom(currentCell.status);
+                    newRoom.name += " " + i + "-" + j;
+                    tempRoomCount++;
+                    DungeonGenerationConfigurationSo.objectPool.Add(newRoom.gameObject);
+                    DungeonGenerationConfigurationSo.hooksManagers.Add(newRoom.hooksManager);
+                }
+            }
+        }
+
+        DungeonGenerationConfigurationSo.roomCount = tempRoomCount;
+    }
+
+    public void TryInitializationOfNavMeshes()
+    {
+        if (DungeonGenerationConfigurationSo.forceNavMeshRecheck)
+        {
+            InitializeNavMeshes();
+            DungeonGenerationConfigurationSo.forceNavMeshRecheck = false;
+        }
+        Log("Checking if all rooms are ready.");
+        Log("Rooms Ready:" + DungeonGenerationConfigurationSo.roomsReady + " / " + DungeonGenerationConfigurationSo.roomCount);
         if (DungeonGenerationConfigurationSo.roomsReady >= DungeonGenerationConfigurationSo.roomCount)
         {
-            Debug.Log("All rooms are ready!");
+            Log("All rooms are ready!");
             InitializeNavMeshes();
+            DungeonGenerationConfigurationSo.canDoGameGeneration = true;
             DungeonGenerationConfigurationSo.roomsReady = 0;
         }
     }
     
     private void InitializeNavMeshes()
     {
-        Debug.Log("Initializing NavMeshes!");
+        Log("Initializing NavMeshes!");
         var surfaces =  FindObjectsOfType<NavMeshSurface>();
         foreach (var s in surfaces)
         {
@@ -236,5 +243,13 @@ public class SBDungeonGenerator : MonoBehaviour
         }
 
         return neighbors;
+    }
+
+    private void Log(string message)
+    {
+        if (verboseDebug)
+        {
+            Debug.Log(message);
+        }
     }
 }

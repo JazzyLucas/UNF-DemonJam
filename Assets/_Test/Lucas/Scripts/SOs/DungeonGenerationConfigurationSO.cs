@@ -2,6 +2,33 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+[CreateAssetMenu]
+
+public class DungeonGenerationConfigurationSO : ScriptableObject
+{
+    public GameObject enemyPrefab;
+    public GameObject[] lightPrefabs;
+    public GameObject[] cratePrefabs;
+    public Vector2Int size;
+    public int startPos = 0;
+    public Rule[] rooms;
+    public Vector2 roomsize;
+    [Header("Higher = Rarer")]
+    public int lightSpawnMultiplier = 30;
+    public int crateSpawnMultiplier = 20;
+    
+    [HideInInspector]
+    public uint roomsReady, roomCount;
+    [HideInInspector] 
+    public bool canDoGameGeneration, forceNavMeshRecheck;
+    [HideInInspector]
+    public List<Cell> board;
+    [HideInInspector]
+    public List<GameObject> objectPool;
+    [HideInInspector]
+    public List<HooksManager> hooksManagers;
+}
+
 public class Cell
 {
     public bool visited = false;
@@ -33,21 +60,4 @@ public class Rule
 
         return 0;
     }
-}
-
-[CreateAssetMenu]
-public class DungeonGenerationConfigurationSO : ScriptableObject
-{
-    public Vector2Int size;
-    public int startPos = 0;
-    public Rule[] rooms;
-    public Vector2 offset;
-
-    
-    [HideInInspector]
-    public uint roomsReady, roomCount;
-    [HideInInspector]
-    public List<Cell> board;
-    [HideInInspector]
-    public List<GameObject> objectPool;
 }

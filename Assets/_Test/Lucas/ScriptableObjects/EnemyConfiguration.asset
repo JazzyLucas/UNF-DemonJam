@@ -9,7 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9fb617ea153b0f542a777e74c170b521, type: 3}
-  m_Name: PlayerConfigurationSO
+  m_Script: {fileID: 11500000, guid: 12fb794f842ea9a49ba81f6b28955c52, type: 3}
+  m_Name: EnemyConfiguration
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 5518658080540035726, guid: bf860fc9a8ec90044a733ed4ac440d17, type: 3}
+  enemySpeed: 0

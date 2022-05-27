@@ -2,12 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Simple capsule-collider controller that uses the legacy input system.
 /// </summary>
+[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
+    #region General Fields
     // Externals
     [SerializeField] private PlayerConfigurationSO playerConfigurationSO;
     [Header("Dependencies")]
@@ -15,22 +18,38 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform directionAnchor;
     [SerializeField] private Transform playerTransform;
     [SerializeField] private float movementSpeed = 1;
+    [SerializeField] private float sprintMultiplier = 2f;
+    [SerializeField] private float sprintDuration = 3f;
+    [SerializeField] private float sprintCooldownMultiplier = 2f;
+    [SerializeField] private float sprintCooldownDelay = 2f;
 
     // Internals
     private Quaternion _rotation { get; set; } // TODO: This is what controls player's facing-direction / what the camera should parent to.
     private Vector2 mouseInputDelta;
     private Vector3 movementInput;
+    private bool isSprintKeyDown;
+    private bool isSprinting;
+    private float sprintDurationTimer, sprintCooldownDelayTimer;
+    private Rigidbody rb;
+    #endregion
+    
+    #region VisualFields
+    [SerializeField] private Image sprintCooldownFillImage;
+    #endregion
 
     #region UnityMethods
 
     private void Awake()
     {
-        
+        this.rb = GetComponent<Rigidbody>();
+        sprintDurationTimer = sprintDuration;
+        sprintCooldownDelayTimer = 0;
     }
 
     private void Update()
     {
         PollInput();
+        CalculateSpeed();
         CalculateRotation();
         
         ApplyRotation();
@@ -54,8 +73,32 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.D))
             movementInput += Vector3.right;
+
+        isSprintKeyDown = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
         
         mouseInputDelta = new Vector2(Input.GetAxis("Mouse X"), Input.GetAxis("Mouse Y"));
+    }
+
+    private void CalculateSpeed()
+    {
+        sprintCooldownFillImage.fillAmount = (sprintDurationTimer / sprintDuration);
+        // Timers
+        if (isSprintKeyDown)
+        {
+            sprintCooldownDelayTimer = sprintCooldownDelay;
+            sprintDurationTimer -= Time.deltaTime;
+        }
+        if (sprintCooldownDelayTimer > 0)
+        {
+            sprintCooldownDelayTimer -= Time.deltaTime;
+        }
+        else
+        {
+            sprintDurationTimer += Time.deltaTime * sprintCooldownMultiplier;
+        }
+        sprintDurationTimer = Mathf.Clamp(sprintDurationTimer, 0, sprintDuration);
+        
+        isSprinting = (sprintDurationTimer > 0) && isSprintKeyDown;
     }
     
     private void CalculateRotation()
@@ -63,7 +106,7 @@ public class PlayerController : MonoBehaviour
         Vector3 rotation = _rotation.eulerAngles;
         Quaternion newRotate = new Quaternion();
         float sens = PlayerConfigurationSO.CameraSensitivity;
-        Debug.Log(sens);
+        //Debug.Log(sens);
         rotation += new Vector3(
             playerConfigurationSO.InvertX ? 1 : -1 * mouseInputDelta.y * sens * Time.deltaTime, 
             playerConfigurationSO.InvertY ? -1 : 1 * mouseInputDelta.x * sens * Time.deltaTime, 
@@ -81,11 +124,12 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyMovement()
     {
-        Transform cameraPivotTransform = directionAnchor.transform;
-        Vector3 position = playerTransform.position;
-        position += cameraPivotTransform.forward * movementInput.z * movementSpeed * Time.deltaTime;
-        position += cameraPivotTransform.right * movementInput.x * movementSpeed * Time.deltaTime;
-        playerTransform.position = position;
+        var cameraPivotTransform = directionAnchor.transform;
+        var position = playerTransform.position;
+        var speed = isSprinting ? movementSpeed * sprintMultiplier : movementSpeed;
+        position += cameraPivotTransform.forward * movementInput.z * speed * Time.deltaTime;
+        position += cameraPivotTransform.right * movementInput.x * speed * Time.deltaTime;
+        rb.MovePosition(position);
     }
     
     private float ClampAngle(float angle, float from, float to)
