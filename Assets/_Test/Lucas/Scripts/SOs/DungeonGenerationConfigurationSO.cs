@@ -7,12 +7,15 @@ using UnityEngine;
 public class DungeonGenerationConfigurationSO : ScriptableObject
 {
     public GameObject enemyPrefab;
+    public GameObject lightingColliderPrefab;
+    public GameObject keyPrefab;
+    public GameObject safePrefab;
     public GameObject[] lightPrefabs;
     public GameObject[] cratePrefabs;
     public Vector2Int size;
     public int startPos = 0;
     public Rule[] rooms;
-    public Vector2 roomsize;
+    public Vector2 roomSize;
     [Header("Higher = Rarer")]
     public int lightSpawnMultiplier = 30;
     public int crateSpawnMultiplier = 20;

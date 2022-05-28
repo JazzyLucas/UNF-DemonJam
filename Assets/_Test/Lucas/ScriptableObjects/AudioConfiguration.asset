@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c483526c9fc9837448eebb041bd632c2, type: 3}
+  m_Name: AudioConfiguration
+  m_EditorClassIdentifier: 
+  ParticularAudioClips:
+  - name: Death
+    clip: {fileID: 8300000, guid: 01e345d14ec11084c96bdcb63c600ef4, type: 3}
+  - name: Victory
+    clip: {fileID: 8300000, guid: b6e00330255de0c49a4470e477059dee, type: 3}
+  AmbientAudioClips:
+  - {fileID: 8300000, guid: 42775b07798bd2c4fa5d65a90f1fb57e, type: 3}
+  - {fileID: 8300000, guid: ccb636ae2fab92a46b99e00a6fed209d, type: 3}
+  - {fileID: 8300000, guid: 7aa41a5b6277f744aac1d829a487c881, type: 3}
+  - {fileID: 8300000, guid: aa82acb57eeb16141925d66531410344, type: 3}
+  - {fileID: 8300000, guid: 4668a695fb02ecd488cdab37ffe0c90e, type: 3}
+  - {fileID: 8300000, guid: 120d9f2bb389ca34c821bc5c18d07fd5, type: 3}
+  - {fileID: 8300000, guid: 96584d090b6a50145a06a54d5ea4adae, type: 3}
+  - {fileID: 8300000, guid: 71a08baf0729f24438b1a49539354a76, type: 3}
+  - {fileID: 8300000, guid: 51204c2fa07db2744b59b24887957e65, type: 3}
+  - {fileID: 8300000, guid: fae2b3aa4b4a4894385e72bc9275734f, type: 3}
+  - {fileID: 8300000, guid: 7967719e5eeb78e4a887ce7fbc968089, type: 3}
+  - {fileID: 8300000, guid: a8ba9f3d211612f4a95467b45c4ed3ba, type: 3}
+  - {fileID: 8300000, guid: ac890f108458c9342904f916d6c5a2d4, type: 3}
+  - {fileID: 8300000, guid: 794a3d0ee58fac54890b460538b20e35, type: 3}
+  - {fileID: 8300000, guid: b0e004d5013f92440a7293e3ef23f00c, type: 3}
+  - {fileID: 8300000, guid: a5b0a6f0c9ad26041b632900058c0f88, type: 3}
+  - {fileID: 8300000, guid: 972a4eb89f1e7dc409ec8c8898357c8a, type: 3}
+  - {fileID: 8300000, guid: 1279ffc6203048242a4cf9372b6c57bd, type: 3}
+  - {fileID: 8300000, guid: 8632f147e1d827949b320bd65a814223, type: 3}
+  - {fileID: 8300000, guid: 8c58b14103501fc42a7bc9d7fcbe0a54, type: 3}
+  ambientAudioLocations: []

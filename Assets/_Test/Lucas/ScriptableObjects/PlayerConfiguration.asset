@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9fb617ea153b0f542a777e74c170b521, type: 3}
+  m_Name: PlayerConfiguration
+  m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 5518658080540035726, guid: bf860fc9a8ec90044a733ed4ac440d17, type: 3}
+  deathUIPrefab: {fileID: 7479090365888345143, guid: 8b2361b5648a7e042988afda6f5d9aa0, type: 3}
+  winUIPrefab: {fileID: 6270417277206901936, guid: e5df8d280c1578341b320e1200bd5502, type: 3}
+  playerReference: {fileID: 0}
+  isPlayerInALight: 0
+  isPlayerInRangeOfEnemy: 0
+  hasFoundKey: 0
+  gameEnd: 0

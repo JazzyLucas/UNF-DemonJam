@@ -19,10 +19,12 @@ public class SBDungeonGenerator : MonoBehaviour
 
     private void Update()
     {
+        /*
         if (Input.GetKeyDown(KeyCode.L))
         {
             DoMazeGenerator();
         }
+        */
     }
 
     private void LateUpdate()
@@ -173,7 +175,7 @@ public class SBDungeonGenerator : MonoBehaviour
                     }
 
 
-                    var newRoom = Instantiate(DungeonGenerationConfigurationSo.rooms[randomRoom].room, new Vector3(i * DungeonGenerationConfigurationSo.roomsize.x, 0, -j * DungeonGenerationConfigurationSo.roomsize.y), Quaternion.identity, transform).GetComponent<SBRoomBehaviour>();
+                    var newRoom = Instantiate(DungeonGenerationConfigurationSo.rooms[randomRoom].room, new Vector3(i * DungeonGenerationConfigurationSo.roomSize.x, 0, -j * DungeonGenerationConfigurationSo.roomSize.y), Quaternion.identity, transform).GetComponent<SBRoomBehaviour>();
                     newRoom.UpdateRoom(currentCell.status);
                     newRoom.name += " " + i + "-" + j;
                     tempRoomCount++;

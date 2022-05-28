@@ -13,18 +13,26 @@ public class GameGeneratorManager : MonoBehaviour
 {
     public const float BIG_OFFSET = 0.5f;
     public const float SMALL_OFFSET = 0.3f;
+    public const string keyOrSafeHookTag = "KeyOrSafeHook";
     
     // Externals
     [SerializeField] private DungeonGenerationConfigurationSO DungeonGenerationConfigurationSO;
     [SerializeField] private PlayerConfigurationSO playerConfigurationSO;
+    [SerializeField] private AudioConfigurationSO audioConfigurationSO;
     [Space(10)]
     [SerializeField] private bool verboseDebug;
     
     // Internals
-    private GameObject playerReference;
     private GameObject enemyReference;
     private List<GameObject> objectPool;
-    
+    private GameObject crateParentGO, lightParentGO;
+
+    private void Awake()
+    {
+        crateParentGO = new GameObject("Crates");
+        lightParentGO = new GameObject("Lights");
+    }
+
     void LateUpdate()
     {
         // Pseudo-Async with SBDungeonGenerator
@@ -39,6 +47,7 @@ public class GameGeneratorManager : MonoBehaviour
 
     private void DoGameGeneration()
     {
+        Log("Cleaning up object pool...");
         if (objectPool != null)
         {
             foreach (var obj in objectPool)
@@ -53,6 +62,9 @@ public class GameGeneratorManager : MonoBehaviour
         FindHookAndSpawnPlayer();
         Log("Placing enemy in a room...");
         FindHookAndSpawnAnEnemy();
+        Log("Activating enemy random-movement...");
+        EnemyController enemyController = enemyReference.GetComponent<EnemyController>();
+        enemyController.AssignNewRandomWaypoint();
         
         Log("Generating hooks for all rooms...");
         foreach (HooksManager hooksManager in DungeonGenerationConfigurationSO.hooksManagers)
@@ -61,12 +73,14 @@ public class GameGeneratorManager : MonoBehaviour
             GenerateLights(hooksManager);
         }
         
+        Log("Placing the key and safe...");
+        FindHookAndSpawnKeyAndSafe();
+
+        Log("Updating AudioConfigurationSO with the ambient sound locations...");
+        GenerateAmbientSoundTransforms();
+        
         Log("Re-baking scene...");
         DungeonGenerationConfigurationSO.forceNavMeshRecheck = true;
-        
-        Log("Activating enemy random-movement...");
-        EnemyController enemyController = enemyReference.GetComponent<EnemyController>();
-        enemyController.navMeshAgent.destination = DungeonGenerationConfigurationSO.hooksManagers[Random.Range(0, DungeonGenerationConfigurationSO.hooksManagers.Count)].playerSpawnHook.transform.position;
     }
 
     private void FindHookAndSpawnPlayer()
@@ -85,13 +99,13 @@ public class GameGeneratorManager : MonoBehaviour
 
         DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].crateLayoutEnum = spawnCrateLayoutEnumSelection;
         
-        if (playerReference == null)
+        if (playerConfigurationSO.playerReference == null)
         {
-            playerReference = Instantiate(playerConfigurationSO.playerPrefab,  DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position + bigOffset, Quaternion.identity);
+            playerConfigurationSO.playerReference = Instantiate(playerConfigurationSO.playerPrefab,  DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position + bigOffset, Quaternion.identity);
         }
         else
         {
-            playerReference.transform.position = DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position + bigOffset;
+            playerConfigurationSO.playerReference.transform.position = DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position + bigOffset;
         }
     }
     
@@ -140,6 +154,7 @@ public class GameGeneratorManager : MonoBehaviour
                                 Random.Range(0, DungeonGenerationConfigurationSO.cratePrefabs.Length)],
                             hook.cratesHook.transform.position + new Vector3(i, 0f, j) + smallOffset,
                             Quaternion.Euler(0, Random.Range(0, 20), 0));
+                        g.transform.parent = crateParentGO.transform;
                         objectPool.Add(g);
                     }
                 }
@@ -165,6 +180,9 @@ public class GameGeneratorManager : MonoBehaviour
                                 Random.Range(0, DungeonGenerationConfigurationSO.lightPrefabs.Length)],
                             hook.lightsHook.transform.position + new Vector3(i, 0f, j) + smallOffset,
                             Quaternion.Euler(0, Random.Range(0, 360), 0));
+                        var lc = Instantiate(DungeonGenerationConfigurationSO.lightingColliderPrefab, g.transform.position, Quaternion.identity);
+                        lc.transform.parent = g.transform;
+                        g.transform.parent = lightParentGO.transform;
                         objectPool.Add(g);
                         return; // We want to return because we want maximum of 1 light per room
                     }
@@ -173,6 +191,35 @@ public class GameGeneratorManager : MonoBehaviour
         }
     }
 
+    private void GenerateAmbientSoundTransforms()
+    {
+        audioConfigurationSO.ambientAudioLocations = new List<Transform>();
+        foreach (HooksManager hooksManager in DungeonGenerationConfigurationSO.hooksManagers)
+        {
+            audioConfigurationSO.ambientAudioLocations.Add(hooksManager.transform);
+        }
+    }
+
+    private void FindHookAndSpawnKeyAndSafe()
+    {
+        List<GameObject> KSHooks = new List<GameObject>(GameObject.FindGameObjectsWithTag(keyOrSafeHookTag));
+        int selection = Random.Range(0, KSHooks.Count);
+        Vector3 smallOffset = new Vector3(Random.Range(-SMALL_OFFSET, SMALL_OFFSET), 0f, Random.Range(-SMALL_OFFSET, SMALL_OFFSET));
+        var key = Instantiate(
+            DungeonGenerationConfigurationSO.keyPrefab,
+            KSHooks[selection].transform.position + smallOffset,
+            Quaternion.Euler(0, Random.Range(0, 20), 0));
+        objectPool.Add(key);
+        KSHooks.Remove(KSHooks[selection]);
+        selection = Random.Range(0, KSHooks.Count);
+        Vector3 smallOffset2 = new Vector3(Random.Range(-SMALL_OFFSET, SMALL_OFFSET), 0f, Random.Range(-SMALL_OFFSET, SMALL_OFFSET));
+        var safe = Instantiate(
+            DungeonGenerationConfigurationSO.safePrefab,
+            KSHooks[selection].transform.position,
+            Quaternion.Euler(0, Random.Range(0, 20), 0));
+        objectPool.Add(safe);
+    }
+    
     /// <summary>
     /// This method and its usages are a complete mess, don't look at it lol.
     /// <br></br>

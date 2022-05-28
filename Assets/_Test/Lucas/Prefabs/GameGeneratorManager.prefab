@@ -46,4 +46,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   DungeonGenerationConfigurationSO: {fileID: 11400000, guid: f266c74b3f6b23642b54ffedc804f59a, type: 2}
   playerConfigurationSO: {fileID: 11400000, guid: d3ef6bd969a5d1f44a5a91e4d5656ce5, type: 2}
+  audioConfigurationSO: {fileID: 11400000, guid: 21d36ccf1b8358449bcfdf546c3b3b8d, type: 2}
   verboseDebug: 1

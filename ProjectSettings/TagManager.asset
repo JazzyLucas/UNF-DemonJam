@@ -7,6 +7,12 @@ TagManager:
   - RoomFloor
   - RoomWall
   - Enemy
+  - EnemyCollider
+  - EnemyDeathCollider
+  - LightCollider
+  - SafeCollider
+  - KeyCollider
+  - KeyOrSafeHook
   layers:
   - Default
   - TransparentFX

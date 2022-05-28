@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/_Test/Lucas/Scenes/LucasDungenTest.unity
+    guid: f01512d4cb5994245b760a11d8baf81d
   m_configObjects: {}

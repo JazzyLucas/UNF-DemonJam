@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
@@ -41,6 +42,8 @@ public class PlayerController : MonoBehaviour
 
     private void Awake()
     {
+        playerConfigurationSO.gameEnd = false;
+        playerConfigurationSO.hasFoundKey = false;
         this.rb = GetComponent<Rigidbody>();
         sprintDurationTimer = sprintDuration;
         sprintCooldownDelayTimer = 0;
@@ -56,7 +59,80 @@ public class PlayerController : MonoBehaviour
         ApplyMovement();
     }
 
+    private void OnTriggerStay(Collider other)
+    {
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.lightObjectTag))
+        {
+            playerConfigurationSO.isPlayerInALight = true;
+        }
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.enemyObjectTag))
+        {
+            playerConfigurationSO.isPlayerInRangeOfEnemy = true;
+        }
+    }
+    
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.lightObjectTag))
+        {
+            playerConfigurationSO.isPlayerInALight = false;
+        }
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.enemyObjectTag))
+        {
+            playerConfigurationSO.isPlayerInRangeOfEnemy = false;
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.enemyDeathObjectTag))
+        {
+            PlayerDies();
+        }
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.safeObjectTag))
+        {
+            if (playerConfigurationSO.hasFoundKey)
+            {
+                PlayerUnlockSafe();
+            }
+        }
+        if (other.gameObject.CompareTag(PlayerConfigurationSO.keyObjectTag))
+        {
+            PlayerObtainKey(other.gameObject);
+        }
+    }
+
     #endregion
+
+    private void PlayerObtainKey(GameObject keyGO)
+    {
+        playerConfigurationSO.hasFoundKey = true;
+        Destroy(keyGO.transform.parent.gameObject);
+        // TODO: more visuals
+    }
+    
+    private void PlayerUnlockSafe()
+    {
+        if (playerConfigurationSO.gameEnd)
+            return;
+        StartCoroutine(GoToMenu());
+        Instantiate(playerConfigurationSO.winUIPrefab, this.transform.position, Quaternion.identity);
+    }
+
+    private void PlayerDies()
+    {
+        if (playerConfigurationSO.gameEnd)
+            return;
+        StartCoroutine(GoToMenu());
+        Instantiate(playerConfigurationSO.deathUIPrefab, this.transform.position, Quaternion.identity);
+    }
+    
+    private IEnumerator GoToMenu()
+    {
+        playerConfigurationSO.gameEnd = true;
+        yield return new WaitForSecondsRealtime(7f);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
     
     private void PollInput()
     {
@@ -105,7 +181,7 @@ public class PlayerController : MonoBehaviour
     {
         Vector3 rotation = _rotation.eulerAngles;
         Quaternion newRotate = new Quaternion();
-        float sens = PlayerConfigurationSO.CameraSensitivity;
+        float sens = PlayerConfigurationSO.CameraSensitivity * 1000;
         //Debug.Log(sens);
         rotation += new Vector3(
             playerConfigurationSO.InvertX ? 1 : -1 * mouseInputDelta.y * sens * Time.deltaTime, 
@@ -124,6 +200,7 @@ public class PlayerController : MonoBehaviour
 
     private void ApplyMovement()
     {
+        rb.velocity = Vector3.zero;
         var cameraPivotTransform = directionAnchor.transform;
         var position = playerTransform.position;
         var speed = isSprinting ? movementSpeed * sprintMultiplier : movementSpeed;

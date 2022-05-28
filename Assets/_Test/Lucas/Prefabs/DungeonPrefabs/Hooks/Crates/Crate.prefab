@@ -191,8 +191,8 @@ GameObject:
   m_Component:
   - component: {fileID: 634088544542613029}
   m_Layer: 0
-  m_Name: SafeOrKeyPoint
-  m_TagString: Untagged
+  m_Name: KeyOrSafeHook
+  m_TagString: KeyOrSafeHook
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
