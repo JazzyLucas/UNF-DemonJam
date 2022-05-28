@@ -15,10 +15,13 @@ MonoBehaviour:
   enemyPrefab: {fileID: 440688401416603779, guid: 2e216f723b6fa9c4db528fca3bba2adf, type: 3}
   lightPrefabs:
   - {fileID: 2386150113843763525, guid: 45439cbc91f94e44bb3ffc08850a77e3, type: 3}
+  - {fileID: 2386150113843763525, guid: 4127ed69307dfdb4094624ec41f78efb, type: 3}
+  - {fileID: 2386150113843763525, guid: b9dc4ebccfe25334d9df44b8900101b5, type: 3}
   cratePrefabs:
   - {fileID: 8604517166847135726, guid: bbedd9768de4ba8448604e2da2015f32, type: 3}
   - {fileID: 8604517166847135726, guid: 779262c3f0fedef4c89ccee78df5fc04, type: 3}
   - {fileID: 8604517166847135726, guid: fca62ade538dd8a4786b1a787b72f89f, type: 3}
+  - {fileID: 4406512887464589236, guid: 2279edf76d96d6e40bf39a65c5d9a52b, type: 3}
   size: {x: 7, y: 7}
   startPos: 0
   rooms:
@@ -27,8 +30,10 @@ MonoBehaviour:
     maxPosition: {x: 0, y: 0}
     obligatory: 0
   roomsize: {x: 7.6, y: 7.6}
+  lightSpawnMultiplier: 30
+  crateSpawnMultiplier: 20
   roomsReady: 0
-  roomCount: 45
+  roomCount: 17
   canDoGameGeneration: 0
   forceNavMeshRecheck: 0
   objectPool:
@@ -49,63 +54,7 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   hooksManagers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}
   - {fileID: 0}

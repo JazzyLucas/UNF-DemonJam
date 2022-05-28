@@ -99,7 +99,6 @@ public class GameGeneratorManager : MonoBehaviour
     {
         // Generate a random spawn
         int spawnSelection = Random.Range(0, DungeonGenerationConfigurationSO.hooksManagers.Count);
-        Vector3 bigOffset = new Vector3(Random.Range(-BIG_OFFSET, BIG_OFFSET), 0f, Random.Range(-BIG_OFFSET, BIG_OFFSET));
         // Set the crate generation of the random spawn preliminarily
         // (we don't want to spawn the player inside a crate)
         CrateLayoutEnum spawnCrateLayoutEnumSelection = Random.Range(0, 2) switch
@@ -113,11 +112,11 @@ public class GameGeneratorManager : MonoBehaviour
         
         if (enemyReference == null)
         {
-            enemyReference = Instantiate(DungeonGenerationConfigurationSO.enemyPrefab,  DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position + bigOffset, Quaternion.identity);
+            enemyReference = Instantiate(DungeonGenerationConfigurationSO.enemyPrefab,  DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position, Quaternion.identity);
         }
         else
         {
-            enemyReference.transform.position = DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position + bigOffset;
+            enemyReference.transform.position = DungeonGenerationConfigurationSO.hooksManagers[spawnSelection].playerSpawnHook.transform.position;
         }
     }
 
