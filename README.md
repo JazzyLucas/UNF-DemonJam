@@ -15,3 +15,7 @@ The project (made in 1 week) featured:
 - Random flickering lights that cause player to be seen by the enemy.
 - Animated and scary Among Us style enemy.
 - Confetti if you win! :)
+
+Check out some early film of the fast procedural gen dungeon with runtime baked navmesh!
+
+![](https://github.com/JazzyLucas/UNF-DemonJam/blob/main/dungen.gif?raw=true)
